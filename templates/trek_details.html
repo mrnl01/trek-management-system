@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Trek Details{% endblock %}
+
+{% block content %}
+<div class="mb-3"><a href="{{ url_for('available_treks') }}" class="small-muted"><i class="bi bi-arrow-left me-1"></i>Back to Treks</a></div>
+
+<div class="detail-hero mb-4">
+    <div class="detail-hero-content d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+        <div><div class="eyebrow">Trek details</div><h1 class="mb-1">{{ trek.name }}</h1><div class="small-muted"><i class="bi bi-geo-alt me-1"></i>{{ trek.location }}</div></div>
+        <div>{% if trek.status == "Open" or trek.status == "Approved" %}<span class="status-badge status-success">{{ trek.status }}</span>{% elif trek.status == "Ongoing" %}<span class="status-badge status-info">{{ trek.status }}</span>{% elif trek.status == "Pending" %}<span class="status-badge status-warning">{{ trek.status }}</span>{% elif trek.status == "Closed" %}<span class="status-badge status-muted">{{ trek.status }}</span>{% elif trek.status == "Completed" %}<span class="status-badge status-success">{{ trek.status }}</span>{% elif trek.status == "Cancelled" %}<span class="status-badge status-danger">{{ trek.status }}</span>{% else %}<span class="status-badge status-muted">{{ trek.status }}</span>{% endif %}</div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="card section-card h-100"><div class="detail-label"><i class="bi bi-geo-alt me-1"></i>Location</div><div class="detail-value">{{ trek.location }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card section-card h-100"><div class="detail-label"><i class="bi bi-bar-chart me-1"></i>Difficulty</div><div class="detail-value">{{ trek.difficulty }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card section-card h-100"><div class="detail-label"><i class="bi bi-clock me-1"></i>Duration</div><div class="detail-value">{{ trek.duration }} days</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card section-card h-100"><div class="detail-label"><i class="bi bi-people me-1"></i>Available Slots</div><div class="detail-value">{{ trek.available_slots }}</div></div></div>
+</div>
+
+<div class="card section-card">
+    <h2 class="divider-title">Trek Schedule</h2>
+    <div class="row g-4 align-items-center">
+        <div class="col-12 col-md-6"><div class="detail-label">Start Date</div><div class="detail-value"><i class="bi bi-calendar-event me-1"></i>{{ trek.start_date }}</div></div>
+        <div class="col-12 col-md-6"><div class="detail-label">End Date</div><div class="detail-value"><i class="bi bi-calendar-check me-1"></i>{{ trek.end_date }}</div></div>
+    </div>
+
+    <div class="d-flex flex-column flex-sm-row gap-2 mt-4 pt-4 border-top">
+         {% if existing_booking %}
+            <button class="btn btn-success" disabled>
+                <i class="bi bi-check-circle me-1"></i>Already Booked
+            </button>
+        {% elif trek.status == "Open" and trek.available_slots > 0 %}
+            <form action="{{ url_for('book_trek', trek_id=trek.id) }}" method="POST">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-calendar-plus me-1"></i>Book This Trek
+                </button>
+            </form>
+        {% elif trek.available_slots == 0 %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-people me-1"></i>No Slots Available
+            </button>
+        {% elif trek.status == "Closed" %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-lock me-1"></i>Booking Closed
+            </button>
+        {% elif trek.status == "Ongoing" %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-play-circle me-1"></i>Trek In Progress
+            </button>
+        {% elif trek.status == "Pending" %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-hourglass-split me-1"></i>Awaiting Approval
+            </button>
+        {% else %}
+            <button class="btn btn-secondary" disabled>
+                <i class="bi bi-check-circle me-1"></i>Trek Completed
+            </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

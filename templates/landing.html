@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrekManager | Premium Mountain Expedition & Trek Management</title>
+    <meta name="description" content="Discover breathtaking mountain treks, manage bookings effortlessly, and experience high-altitude adventures with TrekManager.">
+
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Landing Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="lp-body">
+
+    <!-- 1. NAVBAR -->
+    <nav class="navbar navbar-expand-lg lp-navbar">
+        <div class="container">
+            <a class="lp-brand" href="{{ url_for('home') }}">
+                <span class="lp-brand-icon"><i class="bi bi-signpost-2-fill"></i></span>
+                <span>TREKMANAGER</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-2 text-dark"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="landingNav">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-lg-1 py-3 py-lg-0">
+                    <a class="nav-link lp-nav-link" href="#treks">Explore Treks</a>
+                    <a class="nav-link lp-nav-link" href="#features">Features</a>
+                    <a class="nav-link lp-nav-link" href="#how-it-works">How It Works</a>
+                    <a class="nav-link lp-nav-link" href="#roles">Platform Roles</a>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="lp-btn lp-btn-outline lp-btn-sm ms-lg-3">
+                                <i class="bi bi-grid-1x2"></i> Dashboard
+                            </a>
+                        {% elif current_user.role == 'staff' %}
+                            <a href="{{ url_for('staff_dashboard') }}" class="lp-btn lp-btn-outline lp-btn-sm ms-lg-3">
+                                <i class="bi bi-grid-1x2"></i> Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('user_dashboard') }}" class="lp-btn lp-btn-outline lp-btn-sm ms-lg-3">
+                                <i class="bi bi-grid-1x2"></i> Dashboard
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="lp-btn lp-btn-sm text-danger ms-lg-2">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="lp-btn lp-btn-outline lp-btn-sm ms-lg-3">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="lp-btn lp-btn-primary lp-btn-sm ms-lg-2">
+                            Get Started
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. 3D HERO SECTION (SUNRISE ATMOSPHERE) -->
+    <header class="lp-hero-container">
+        <canvas id="hero-3d-canvas"></canvas>
+        <div class="lp-hero-fallback"></div>
+        <div class="lp-hero-overlay"></div>
+
+        <div class="lp-hero-content">
+            <div class="lp-hero-card-surface">
+                <div class="lp-section-tag">
+                    <i class="bi bi-brightness-high-fill"></i> Golden-Hour Alpine Expeditions
+                </div>
+                
+                <h1 class="lp-heading-xl">
+                    YOUR NEXT ADVENTURE<br>
+                    <span style="color: var(--lp-accent-coral);">STARTS HERE.</span>
+                </h1>
+
+                <p class="lp-subtext">
+                    Discover treks, manage bookings, and experience the mountains with ease. Premium expedition logistics designed for modern alpine adventurers.
+                </p>
+
+                <div class="lp-hero-cta-group">
+                    <a href="#treks" class="lp-btn lp-btn-primary">
+                        Explore Treks <i class="bi bi-arrow-right"></i>
+                    </a>
+                    {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('register') }}" class="lp-btn lp-btn-outline">
+                            Get Started
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('user_dashboard') if current_user.role == 'trekker' else (url_for('staff_dashboard') if current_user.role == 'staff' else url_for('admin_dashboard')) }}" class="lp-btn lp-btn-outline">
+                            Go to Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <a href="#treks" class="lp-scroll-badge">
+            <span>Scroll To Discover</span>
+            <i class="bi bi-chevron-double-down"></i>
+        </a>
+    </header>
+
+    <main>
+        <!-- 3. TREK DISCOVERY SECTION (Soft Cream) -->
+        <section id="treks" class="lp-section lp-bg-cream">
+            <div class="container">
+                <div class="lp-section-header lp-reveal">
+                    <div class="lp-section-tag">
+                        <i class="bi bi-signpost-split"></i> Curated Expeditions
+                    </div>
+                    <h2 class="lp-heading-lg">FIND YOUR NEXT TRAIL</h2>
+                    <p class="lp-subtext">Choose from handpicked alpine trails and high mountain passes managed by experienced trek leaders.</p>
+                </div>
+
+                <div class="lp-trek-grid">
+                    {% if treks and treks|length > 0 %}
+                        {% for trek in treks %}
+                            <div class="lp-trek-card lp-reveal">
+                                <div class="lp-trek-header">
+                                    <div class="lp-trek-bg-art"></div>
+                                    <span class="lp-badge-diff {% if trek.difficulty == 'Easy' %}diff-easy{% elif trek.difficulty == 'Moderate' %}diff-moderate{% else %}diff-hard{% endif %}">
+                                        {{ trek.difficulty }}
+                                    </span>
+                                    <h3 class="lp-trek-title">{{ trek.name }}</h3>
+                                </div>
+                                <div class="lp-trek-body">
+                                    <div class="lp-trek-meta">
+                                        <span class="lp-trek-meta-item"><i class="bi bi-geo-alt-fill"></i> {{ trek.location }}</span>
+                                        <span class="lp-trek-meta-item"><i class="bi bi-clock-fill"></i> {{ trek.duration }} Days</span>
+                                    </div>
+                                    
+                                    <div class="lp-slots-bar-wrap">
+                                        <div class="lp-slots-label">
+                                            <span>Available Slots</span>
+                                            <span><strong>{{ trek.available_slots }}</strong> / {{ trek.total_slots }}</span>
+                                        </div>
+                                        <div class="lp-slots-progress">
+                                            <div class="lp-slots-fill" style="width: {{ (trek.available_slots / (trek.total_slots or 1) * 100)|round }}%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-10 mt-auto">
+                                        <span class="text-muted small">
+                                            <i class="bi bi-calendar3 me-1"></i> Starts {{ trek.start_date.strftime('%b %d, %Y') if trek.start_date else 'Soon' }}
+                                        </span>
+                                        {% if current_user.is_authenticated and current_user.role == 'trekker' %}
+                                            <a href="{{ url_for('trek_details', trek_id=trek.id) }}" class="lp-btn lp-btn-primary lp-btn-sm">
+                                                View Trek
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('login') }}" class="lp-btn lp-btn-primary lp-btn-sm">
+                                                Book Now
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Showcase Cards if database has no active open treks -->
+                        <div class="lp-trek-card lp-reveal">
+                            <div class="lp-trek-header">
+                                <div class="lp-trek-bg-art"></div>
+                                <span class="lp-badge-diff diff-moderate">Moderate</span>
+                                <h3 class="lp-trek-title">Kedarkantha Summit Expedition</h3>
+                            </div>
+                            <div class="lp-trek-body">
+                                <div class="lp-trek-meta">
+                                    <span class="lp-trek-meta-item"><i class="bi bi-geo-alt-fill"></i> Uttarakhand, Himalayas</span>
+                                    <span class="lp-trek-meta-item"><i class="bi bi-clock-fill"></i> 6 Days</span>
+                                </div>
+                                <div class="lp-slots-bar-wrap">
+                                    <div class="lp-slots-label">
+                                        <span>Available Slots</span>
+                                        <span><strong>12</strong> / 20</span>
+                                    </div>
+                                    <div class="lp-slots-progress"><div class="lp-slots-fill" style="width: 60%;"></div></div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-10 mt-auto">
+                                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i> Oct 15, 2026</span>
+                                    <a href="{{ url_for('register') }}" class="lp-btn lp-btn-primary lp-btn-sm">Explore Trek</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lp-trek-card lp-reveal">
+                            <div class="lp-trek-header">
+                                <div class="lp-trek-bg-art"></div>
+                                <span class="lp-badge-diff diff-hard">Hard</span>
+                                <h3 class="lp-trek-title">Roopkund High Altitude Trail</h3>
+                            </div>
+                            <div class="lp-trek-body">
+                                <div class="lp-trek-meta">
+                                    <span class="lp-trek-meta-item"><i class="bi bi-geo-alt-fill"></i> Chamoli, Himalayas</span>
+                                    <span class="lp-trek-meta-item"><i class="bi bi-clock-fill"></i> 8 Days</span>
+                                </div>
+                                <div class="lp-slots-bar-wrap">
+                                    <div class="lp-slots-label">
+                                        <span>Available Slots</span>
+                                        <span><strong>8</strong> / 15</span>
+                                    </div>
+                                    <div class="lp-slots-progress"><div class="lp-slots-fill" style="width: 53%;"></div></div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-10 mt-auto">
+                                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i> Nov 02, 2026</span>
+                                    <a href="{{ url_for('register') }}" class="lp-btn lp-btn-primary lp-btn-sm">Explore Trek</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lp-trek-card lp-reveal">
+                            <div class="lp-trek-header">
+                                <div class="lp-trek-bg-art"></div>
+                                <span class="lp-badge-diff diff-easy">Easy</span>
+                                <h3 class="lp-trek-title">Valley of Flowers Alpine Pass</h3>
+                            </div>
+                            <div class="lp-trek-body">
+                                <div class="lp-trek-meta">
+                                    <span class="lp-trek-meta-item"><i class="bi bi-geo-alt-fill"></i> Garhwal Region</span>
+                                    <span class="lp-trek-meta-item"><i class="bi bi-clock-fill"></i> 5 Days</span>
+                                </div>
+                                <div class="lp-slots-bar-wrap">
+                                    <div class="lp-slots-label">
+                                        <span>Available Slots</span>
+                                        <span><strong>18</strong> / 25</span>
+                                    </div>
+                                    <div class="lp-slots-progress"><div class="lp-slots-fill" style="width: 72%;"></div></div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-secondary border-opacity-10 mt-auto">
+                                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i> Sep 28, 2026</span>
+                                    <a href="{{ url_for('register') }}" class="lp-btn lp-btn-primary lp-btn-sm">Explore Trek</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. WHY TREKMANAGER / FEATURES (Powder Blue) -->
+        <section id="features" class="lp-section lp-bg-powder">
+            <div class="container">
+                <div class="lp-section-header lp-reveal">
+                    <div class="lp-section-tag">
+                        <i class="bi bi-stars"></i> Platform Features
+                    </div>
+                    <h2 class="lp-heading-lg">EVERYTHING YOU NEED FOR THE JOURNEY</h2>
+                    <p class="lp-subtext">Purpose-built features designed to manage mountain expeditions seamlessly from start to summit.</p>
+                </div>
+
+                <div class="lp-feature-grid">
+                    <div class="lp-feature-card lp-reveal">
+                        <div class="lp-feature-icon">
+                            <i class="bi bi-compass-fill"></i>
+                        </div>
+                        <h3 class="lp-heading-md">Discover</h3>
+                        <p>Explore trekking experiences suited to different adventure levels with real-time slot availability and full itinerary details.</p>
+                    </div>
+
+                    <div class="lp-feature-card lp-reveal">
+                        <div class="lp-feature-icon">
+                            <i class="bi bi-ticket-perforated-fill"></i>
+                        </div>
+                        <h3 class="lp-heading-md">Book</h3>
+                        <p>Reserve your trek through a simple booking experience with instant confirmation and automated slot allocation.</p>
+                    </div>
+
+                    <div class="lp-feature-card lp-reveal">
+                        <div class="lp-feature-icon">
+                            <i class="bi bi-kanban-fill"></i>
+                        </div>
+                        <h3 class="lp-heading-md">Manage</h3>
+                        <p>Manage treks, participants, staff assignments, and expedition statuses efficiently through intuitive role dashboards.</p>
+                    </div>
+
+                    <div class="lp-feature-card lp-reveal">
+                        <div class="lp-feature-icon">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <h3 class="lp-heading-md">Secure</h3>
+                        <p>Role-based access control keeps the platform organized and secure for trekkers, staff leaders, and platform administrators.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. HOW IT WORKS (Soft Cream) -->
+        <section id="how-it-works" class="lp-section lp-bg-cream">
+            <div class="container">
+                <div class="lp-section-header lp-reveal">
+                    <div class="lp-section-tag">
+                        <i class="bi bi-map-fill"></i> Three-Step Journey
+                    </div>
+                    <h2 class="lp-heading-lg">HOW IT WORKS</h2>
+                    <p class="lp-subtext">From selecting your trail to summit day, getting into the mountains is simple.</p>
+                </div>
+
+                <div class="lp-steps-container">
+                    <div class="lp-trail-path"></div>
+
+                    <div class="lp-step-card lp-reveal">
+                        <div class="lp-step-num">01</div>
+                        <h3 class="lp-heading-md">DISCOVER</h3>
+                        <p class="text-muted small">Explore available trekking experiences, filter by difficulty and duration, and select your target trail.</p>
+                    </div>
+
+                    <div class="lp-step-card lp-reveal">
+                        <div class="lp-step-num">02</div>
+                        <h3 class="lp-heading-md">BOOK</h3>
+                        <p class="text-muted small">Choose your trek, reserve your spot with zero friction, and receive instant confirmation details.</p>
+                    </div>
+
+                    <div class="lp-step-card lp-reveal">
+                        <div class="lp-step-num">03</div>
+                        <h3 class="lp-heading-md">ADVENTURE</h3>
+                        <p class="text-muted small">Meet your assigned trek staff, prepare your gear, and set out for an unforgettable high-altitude journey.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ROLE-BASED EXPERIENCE (Very Light Lavender) -->
+        <section id="roles" class="lp-section lp-bg-lavender">
+            <div class="container">
+                <div class="lp-section-header lp-reveal">
+                    <div class="lp-section-tag">
+                        <i class="bi bi-people-fill"></i> Role Experience
+                    </div>
+                    <h2 class="lp-heading-lg">ONE PLATFORM. THREE EXPERIENCES.</h2>
+                    <p class="lp-subtext">Custom workflows designed specifically for participants, expedition staff, and platform managers.</p>
+                </div>
+
+                <div class="lp-role-grid">
+                    <div class="lp-role-card lp-reveal">
+                        <div>
+                            <span class="lp-role-badge">EXPEDITION MEMBER</span>
+                            <h3 class="lp-heading-md">TREKKER</h3>
+                            <p>Explore treks, check real-time slot availability, reserve bookings, and view your personal trek history in a dedicated dashboard.</p>
+                        </div>
+                        <a href="{{ url_for('trekker_register') }}" class="lp-btn lp-btn-outline lp-btn-sm w-100">
+                            Register as Trekker <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="lp-role-card lp-reveal">
+                        <div>
+                            <span class="lp-role-badge">EXPEDITION LEADER</span>
+                            <h3 class="lp-heading-md">TREK STAFF</h3>
+                            <p>Manage assigned mountain routes, update expedition progress, track registered participants, and manage group capacity.</p>
+                        </div>
+                        <a href="{{ url_for('staff_register') }}" class="lp-btn lp-btn-outline lp-btn-sm w-100">
+                            Apply as Staff <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="lp-role-card lp-reveal">
+                        <div>
+                            <span class="lp-role-badge">PLATFORM OPERATIONS</span>
+                            <h3 class="lp-heading-md">ADMIN</h3>
+                            <p>Full control over platform operations: create and configure treks, assign staff leaders, approve staff accounts, and manage bookings.</p>
+                        </div>
+                        <a href="{{ url_for('login') }}" class="lp-btn lp-btn-outline lp-btn-sm w-100">
+                            Admin Login <i class="bi bi-lock-fill"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. FINAL CTA SECTION (Warm Peach Sunset Atmosphere) -->
+        <section class="lp-section lp-bg-cream">
+            <div class="container">
+                <div class="lp-final-cta-box lp-reveal">
+                    <div class="lp-section-tag mx-auto mb-3">
+                        <i class="bi bi-mountain"></i> Start Your Journey
+                    </div>
+                    <h2 class="lp-heading-xl mb-3">THE MOUNTAINS ARE WAITING.</h2>
+                    <p class="lp-subtext mb-4 mx-auto text-dark">Your next journey is only a few clicks away. Choose your trail and take the first step today.</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="#treks" class="lp-btn lp-btn-primary">
+                            Explore Treks <i class="bi bi-arrow-right"></i>
+                        </a>
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('register') }}" class="lp-btn lp-btn-outline">
+                                Get Started
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 8. FOOTER (Deep Navy) -->
+    <footer class="lp-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <a class="lp-brand lp-footer-brand" href="{{ url_for('home') }}">
+                        <span class="lp-brand-icon"><i class="bi bi-signpost-2-fill"></i></span>
+                        <span>TREKMANAGER</span>
+                    </a>
+                    <p class="small text-muted mt-3">
+                        A modern mountain expedition and trek management platform built for adventurers, guide staff, and expedition administrators.
+                    </p>
+                </div>
+
+                <div class="col-6 col-lg-2 offset-lg-2">
+                    <h4 class="lp-footer-title">Navigation</h4>
+                    <ul class="lp-footer-links">
+                        <li><a href="#treks">Explore Treks</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#roles">Roles</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-lg-2">
+                    <h4 class="lp-footer-title">Account</h4>
+                    <ul class="lp-footer-links">
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                        <li><a href="{{ url_for('trekker_register') }}">Trekker Sign Up</a></li>
+                        <li><a href="{{ url_for('staff_register') }}">Staff Application</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2">
+                    <h4 class="lp-footer-title">Platform</h4>
+                    <ul class="lp-footer-links">
+                        <li><span class="badge bg-primary bg-opacity-25 text-white">Flask Backend</span></li>
+                        <li><span class="badge bg-info bg-opacity-25 text-white mt-1">WebGL 3D Enabled</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="lp-footer-bottom">
+                <div>&copy; 2026 TrekManager Application. All rights reserved.</div>
+                <div>Designed for high-altitude mountain expeditions.</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Custom 3D Landing JS -->
+    <script src="{{ url_for('static', filename='js/landing-3d.js') }}"></script>
+</body>
+</html>

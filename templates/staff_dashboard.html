@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Staff Dashboard{% endblock %}
+{% block content %}
+<div class="page-header d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-end">
+    <div>
+        <div class="eyebrow">Staff dashboard</div>
+        <h1 class="page-title">
+            Welcome, {{ current_user.name }}</h1>
+        <p class="page-subtitle">
+            Manage the treks assigned to you and keep participant information up to date.
+        </p>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-betweenalign-items-start">
+                <div>
+                    <div class="stat-label">
+                        Assigned Treks
+                    </div>
+                    <div class="stat-value">
+                        {{ total_assigned }}
+                    </div>
+                </div>
+                <div class="stat-icon"><i class="bi bi-signpost-split"></i></div></div></div></div>
+
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between
+    align-items-start"><div><div class="stat-label">
+        Participants
+    </div><div class="stat-value">
+        {{ total_participants
+    }}</div></div>
+        <div class="stat-icon"><i class="bi bi-people"></i></div></div></div></div>
+
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between
+    align-items-start"><div><div class="stat-label">
+        Upcoming</div>
+        <div class="stat-value">
+            {{ upcoming_count }}</div></div>
+        <div class="stat-icon"><i class="bi bi-calendar-event"></i></div></div></div></div>
+
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="d-flex justify-content-between
+    align-items-start"><div><div class="stat-label">
+        Completed
+    </div><div class="stat-value">
+        {{ completed_trek_count }}</div></div><div class="stat-icon"><i class="bi bi-check2-circle"></i></div></div></div></div>
+</div>
+
+<div class="card section-card">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div><h2 class="section-title">
+            My Assigned Treks
+        </h2><p class="section-caption">
+            Only treks assigned to your staff account by the admin are shown here.</p></div>
+    </div>
+    {% if trek_data %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Trek</th><th>Location</th><th>Difficulty</th><th>Dates</th><th>Participants</th>
+                <th>Capacity</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+            {% for item in trek_data %}
+                {% set trek = item.trek %}
+                <tr>
+                    <td><div class="fw-semibold">{{ trek.name }}</div><div class="small-muted">Trek #{{ trek.id
+                    }}</div></td>
+                    <td>{{ trek.location }}</td>
+                    <td>{{ trek.difficulty }}</td>
+                    <td>{{ trek.start_date }}<br><span class="small-muted">to {{ trek.end_date }}</span></td>
+                    <td><span class="status-badge status-info"><i class="bi bi-people me-1"></i>{{
+                    item.participant_count }} active</span></td>
+                    <td><span class="fw-semibold">{{ trek.available_slots }}</span> / {{ trek.total_slots }}</td>
+                    <td>
+                        {% if trek.status == "Ongoing" %}<span class="status-badge status-info">Ongoing</span>
+                        {% elif trek.status == "Completed" %}<span class="status-badge status-success">Completed</span>
+                        {% elif trek.status == "Pending" %}<span class="status-badge status-warning">Pending</span>
+                        {% elif trek.status == "Closed" %}<span class="status-badge status-muted">Closed</span>
+                        {% elif trek.status == "Approved" %}<span class="status-badge status-success">Approved</span>
+                        {% else %}<span class="status-badge status-success">{{ trek.status }}</span>{% endif %}
+                    </td>
+                    <td><a href="{{ url_for('staff_trek_details', trek_id=trek.id) }}" class="btn btn-primary
+                    btn-sm"><i class="bi bi-sliders me-1"></i>Manage</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-signpost"></i></div><div
+    class="empty-title">No treks assigned yet</div><p class="empty-text">An admin must assign a trek to your account
+    before it appears here.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

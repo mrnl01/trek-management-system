@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="page-header text-center"><div class="eyebrow">Trek Manager</div><h1 class="page-title">Create Your Account</h1><p class="page-subtitle">Choose the account type that matches how you use Trek Manager.</p></div>
+
+<div class="row justify-content-center g-4">
+    <div class="col-12 col-md-6 col-lg-5">
+        <div class="card section-card h-100 text-center">
+            <div class="profile-avatar mx-auto mb-3"><i class="bi bi-person-walking"></i></div>
+            <h2 class="h5 mb-2">Trekker</h2>
+            <p class="text-muted small mb-4">Explore available treks, view details and make bookings.</p>
+            <a href="{{ url_for('trekker_register') }}" class="btn btn-primary w-100 mt-auto"><i class="bi bi-compass me-1"></i>Register as Trekker</a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-5">
+        <div class="card section-card h-100 text-center">
+            <div class="profile-avatar mx-auto mb-3"><i class="bi bi-person-badge"></i></div>
+            <h2 class="h5 mb-2">Trek Staff</h2>
+            <p class="text-muted small mb-4">Apply as trek staff to manage assigned treks and participants.</p>
+            <a href="{{ url_for('staff_register') }}" class="btn btn-outline-primary w-100 mt-auto"><i class="bi bi-people me-1"></i>Register as Staff</a>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4"><span class="small-muted">Already have an account?</span> <a href="{{ url_for('login') }}" class="fw-semibold">Login here</a></div>
+{% endblock %}

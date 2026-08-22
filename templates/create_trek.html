@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Create Trek{% endblock %}
+
+{% block content %}
+<div class="page-header"><div class="eyebrow">Administration</div><h1 class="page-title">Create New Trek</h1><p class="page-subtitle">Add a new trekking experience to Trek Manager.</p></div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-9 col-xl-8">
+        <div class="card section-card">
+            <div class="d-flex align-items-center gap-3 mb-4"><span class="detail-icon"><i class="bi bi-signpost-split"></i></span><div><h2 class="section-title">Trek Information</h2><p class="section-caption">Enter the details shown to trekkers.</p></div></div>
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-12"><label for="name" class="form-label">Trek Name</label><input type="text" id="name" name="name" class="form-control" placeholder="Enter trek name" required></div>
+                    <div class="col-12 col-md-6"><label for="location" class="form-label">Location</label><input type="text" id="location" name="location" class="form-control" placeholder="Enter trek location" required></div>
+                    <div class="col-12 col-md-6"><label for="difficulty" class="form-label">Difficulty</label><select id="difficulty" name="difficulty" class="form-select"><option value="" selected disabled>Select difficulty</option><option>Easy</option><option>Moderate</option><option>Hard</option></select></div>
+                    <div class="col-12 col-md-6"><label for="duration" class="form-label">Duration (in days)</label><input type="number" id="duration" name="duration" class="form-control" placeholder="Enter duration in days" min="1" required></div>
+                    <div class="col-12 col-md-6"><label for="total_slots" class="form-label">Total Slots</label><input type="number" id="total_slots" name="total_slots" class="form-control" placeholder="Enter total trek capacity" min="1" required></div>
+                    <div class="col-12 col-md-6"><label for="start_date" class="form-label">Start Date</label><input type="date" id="start_date" name="start_date" class="form-control" required></div>
+                    <div class="col-12 col-md-6"><label for="end_date" class="form-label">End Date</label><input type="date" id="end_date" name="end_date" class="form-control" required></div>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-2 mt-4 pt-3 border-top">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg me-1"></i>Create Trek</button>
+                    <a href="{{ url_for('admin_treks') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

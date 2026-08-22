@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}User Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-end">
+    <div>
+        <div class="eyebrow">Trekker dashboard</div>
+        <h1 class="page-title">Welcome, {{ current_user.name }}</h1>
+        <p class="page-subtitle">Find your next adventure, manage bookings, and track your trekking history.</p>
+    </div>
+    <a href="{{ url_for('available_treks') }}" class="btn btn-primary"><i class="bi bi-search me-1"></i>Explore
+    Treks</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start"><div><div class="stat-label">Available
+            Treks</div><div class="stat-value">{{ available_count }}</div></div><div class="stat-icon"><i class="bi
+            bi-signpost-split"></i></div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start"><div><div class="stat-label">My
+            Bookings</div><div class="stat-value">{{ booking_count }}</div></div><div class="stat-icon"><i class="bi
+            bi-calendar-check"></i></div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start"><div><div
+            class="stat-label">Upcoming</div><div class="stat-value">{{ upcoming_count }}</div></div><div
+            class="stat-icon"><i class="bi bi-calendar-event"></i></div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start"><div><div
+            class="stat-label">Completed</div><div class="stat-value">{{ completed_count }}</div></div><div
+            class="stat-icon"><i class="bi bi-trophy"></i></div></div>
+        </div>
+    </div>
+</div>
+<div class="row g-4 mb-4">
+    <div class="col-12 col-xl-7">
+        <div class="card section-card h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div><h2 class="section-title">Upcoming Bookings</h2><p class="section-caption">Your next confirmed
+                trekking experiences.</p></div>
+                <a href="{{ url_for('my_bookings') }}" class="small-muted">View all</a>
+            </div>
+            {% if upcoming_bookings %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Trek</th><th>Date</th><th>Location</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for booking in upcoming_bookings %}
+                        <tr>
+                            <td><a class="fw-semibold" href="{{ url_for('trek_details', trek_id=booking.trek.id) }}">{{
+                            booking.trek.name }}</a></td>
+                            <td>{{ booking.trek.start_date }}</td>
+                            <td>{{ booking.trek.location }}</td>
+                            <td><span class="status-badge status-success">{{ booking.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-calendar-x"></i></div><div
+            class="empty-title">No upcoming bookings</div><p class="empty-text">Book an open trek to see it here.</p><a
+            href="{{ url_for('available_treks') }}" class="btn btn-primary">Find a Trek</a></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-12 col-xl-5">
+        <div class="card section-card h-100">
+            <h2 class="section-title mb-1">Quick Actions</h2>
+            <p class="section-caption mb-3">Common trekker tasks.</p>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('available_treks') }}" class="quick-action"><span class="quick-action-icon"><i
+                class="bi bi-compass"></i></span><span><span class="quick-action-title d-block">Browse Open
+                Treks</span><span class="quick-action-text d-block">Search by difficulty and location.</span></span><i
+                class="bi bi-chevron-right quick-action-arrow"></i></a>
+                <a href="{{ url_for('my_bookings') }}" class="quick-action"><span class="quick-action-icon"><i
+                class="bi bi-ticket-perforated"></i></span><span><span class="quick-action-title d-block">Manage
+                Bookings</span><span class="quick-action-text d-block">View status or cancel an active
+                booking.</span></span><i class="bi bi-chevron-right quick-action-arrow"></i></a>
+                <a href="{{ url_for('profile') }}" class="quick-action"><span class="quick-action-icon"><i class="bi
+                bi-person"></i></span><span><span class="quick-action-title d-block">Edit Profile</span><span
+                class="quick-action-text d-block">Keep your contact information current.</span></span><i class="bi
+                bi-chevron-right quick-action-arrow"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card section-card mb-4">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div><h2 class="section-title">Available Treks</h2><p class="section-caption">Only open treks with remaining
+        capacity are shown.</p></div>
+        <a href="{{ url_for('available_treks') }}" class="small-muted">Search all</a>
+    </div>
+    {% if treks %}
+    <div class="row g-3">
+        {% for trek in treks[:6] %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100 p-3">
+                <div class="d-flex justify-content-between gap-2 mb-2"><span class="status-badge
+                status-success">Open</span><span class="small-muted">{{ trek.difficulty }}</span></div>
+                <h3 class="h5 mb-1">{{ trek.name }}</h3>
+                <div class="small-muted mb-3"><i class="bi bi-geo-alt me-1"></i>{{ trek.location }}</div>
+                <div class="row g-2 small mb-3">
+                    <div class="col-6"><div class="detail-label">Starts</div><div class="fw-semibold">{{
+                    trek.start_date }}</div></div>
+                    <div class="col-6"><div class="detail-label">Slots</div><div class="fw-semibold">{{
+                    trek.available_slots }}</div></div>
+                </div>
+                <a href="{{ url_for('trek_details', trek_id=trek.id) }}" class="btn btn-outline-primary w-100">View
+                Trek</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-signpost"></i></div><div
+    class="empty-title">No open treks right now</div><p class="empty-text">Check again later for new trekking
+    opportunities.</p></div>
+    {% endif %}
+</div>
+<div class="card section-card">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div><h2 class="section-title">Trekking History</h2><p class="section-caption">Your completed trekking
+        experiences.</p></div>
+        <a href="{{ url_for('my_bookings') }}" class="small-muted">View full history</a>
+    </div>
+    {% if completed_bookings %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Trek</th><th>Date</th><th>Location</th><th>Booking Status</th></tr></thead>
+            <tbody>
+            {% for booking in completed_bookings %}
+                <tr>
+                    <td class="fw-semibold">{{ booking.trek.name }}</td>
+                    <td>{{ booking.trek.start_date }}</td>
+                    <td>{{ booking.trek.location }}</td>
+                    <td><span class="status-badge status-success">Completed</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-clock-history"></i></div><div
+    class="empty-title">No completed treks yet</div><p class="empty-text">Your completed trekking history will appear
+    here.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

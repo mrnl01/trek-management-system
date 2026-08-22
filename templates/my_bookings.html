@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}My Bookings{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="eyebrow">Trekker</div>
+    <h1 class="page-title">My Bookings & History</h1>
+    <p class="page-subtitle">Track active reservations, cancellations, and completed trekking experiences.</p>
+</div>
+{% set active = bookings | selectattr('status', 'equalto', 'Booked') | list %}
+{% set completed = bookings | selectattr('status', 'equalto', 'Completed') | list %}
+{% set cancelled = bookings | selectattr('status', 'equalto', 'Cancelled') | list %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-4"><div class="stat-card"><div class="stat-label">Active Bookings</div><div
+    class="stat-value">{{ active|length }}</div></div></div>
+    <div class="col-6 col-lg-4"><div class="stat-card"><div class="stat-label">Completed Treks</div><div
+    class="stat-value">{{ completed|length }}</div></div></div>
+    <div class="col-6 col-lg-4"><div class="stat-card"><div class="stat-label">Cancelled</div><div
+    class="stat-value">{{ cancelled|length }}</div></div></div>
+</div>
+<div class="card section-card mb-4">
+    <h2 class="divider-title">Active Bookings</h2>
+    {% if active %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Trek</th><th>Location</th><th>Start Date</th><th>Booking Date</th><th>Trek
+            Status</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for booking in active %}
+                <tr>
+                    <td><a class="fw-semibold" href="{{ url_for('trek_details', trek_id=booking.trek.id) }}">{{
+                    booking.trek.name }}</a></td>
+                    <td>{{ booking.trek.location }}</td>
+                    <td>{{ booking.trek.start_date }}</td>
+                    <td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td>
+                    <td><span class="status-badge status-success">{{ booking.trek.status }}</span></td>
+                    <td>
+                        {% if booking.trek.status in ["Open", "Closed"] %}
+                        <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking.id) }}"><button
+                        type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle
+                        me-1"></i>Cancel</button></form>
+                        {% else %}<span class="small-muted">No cancellation</span>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-calendar-x"></i></div><div
+    class="empty-title">No active bookings</div><p class="empty-text">Browse open treks to make a booking.</p><a
+    href="{{ url_for('available_treks') }}" class="btn btn-primary">Explore Treks</a></div>
+    {% endif %}
+</div>
+<div class="card section-card mb-4">
+    <h2 class="divider-title">Completed Trekking History</h2>
+    {% if completed %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Trek</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for booking in completed %}
+                <tr><td class="fw-semibold">{{ booking.trek.name }}</td><td>{{ booking.trek.location }}</td><td>{{
+                booking.trek.start_date }}</td><td>{{ booking.trek.end_date }}</td><td><span class="status-badge
+                status-success">Completed</span></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-clock-history"></i></div><div
+    class="empty-title">No completed treks yet</div></div>
+    {% endif %}
+</div>
+<div class="card section-card">
+    <h2 class="divider-title">Cancelled Bookings</h2>
+    {% if cancelled %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Trek</th><th>Location</th><th>Original Date</th><th>Booking
+            Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for booking in cancelled %}
+                <tr><td class="fw-semibold">{{ booking.trek.name }}</td><td>{{ booking.trek.location }}</td><td>{{
+                booking.trek.start_date }}</td><td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td><td><span
+                class="status-badge status-danger">Cancelled</span></td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state px-0 pb-1"><div class="empty-icon"><i class="bi bi-x-circle"></i></div><div
+    class="empty-title">No cancelled bookings</div></div>
+    {% endif %}
+</div>
+{% endblock %}

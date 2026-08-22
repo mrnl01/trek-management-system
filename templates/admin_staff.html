@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Staff{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="eyebrow">Administration</div>
+    <h1 class="page-title">Manage Staff</h1>
+    <p class="page-subtitle">Review staff applications and manage account access.</p>
+</div>
+
+<div class="card search-card">
+    <form method="GET" action="{{ url_for('admin_staff') }}" class="row g-2 align-items-end">
+        <div class="col-12 col-lg-8">
+            <label for="search" class="form-label">Search staff</label>
+            <input type="text" id="search" name="search" class="form-control" placeholder="Search by name or ID" value="{{ search }}">
+        </div>
+        <div class="col-6 col-lg-2"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Search</button></div>
+        <div class="col-6 col-lg-2"><a href="{{ url_for('admin_staff') }}" class="btn btn-outline-secondary w-100">Clear</a></div>
+    </form>
+</div>
+
+{% if staff_members %}
+<div class="card table-card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Approval Status</th><th>Account Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for staff in staff_members %}
+                <tr>
+                    <td class="fw-semibold">#{{ staff.id }}</td>
+                    <td><div class="fw-semibold">{{ staff.name }}</div></td>
+                    <td>{{ staff.email }}</td>
+                    <td>
+                        {% if staff.is_approved %}<span class="status-badge status-success"><i class="bi bi-check-circle"></i> Approved</span>
+                        {% else %}<span class="status-badge status-warning"><i class="bi bi-clock"></i> Pending</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if staff.is_blacklisted %}<span class="status-badge status-danger"><i class="bi bi-slash-circle"></i> Blacklisted</span>
+                        {% else %}<span class="status-badge status-success">Active</span>{% endif %}
+                    </td>
+
+                    <td>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if not staff.is_approved and not staff.is_blacklisted %}
+                                <form action="{{ url_for('approve_staff', staff_id=staff.id) }}" method="POST"><button class="btn btn-sm btn-success" type="submit"><i class="bi bi-check-lg me-1"></i>Approve</button></form>
+                            {% elif staff.is_approved %}
+                                <span class="small-muted align-self-center"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                            {% endif %}
+
+                            {% if not staff.is_blacklisted %}
+                                <form action="{{ url_for('blacklist_staff', staff_id=staff.id) }}" method="POST"><button class="btn btn-sm btn-danger" type="submit"><i class="bi bi-slash-circle me-1"></i>Blacklist</button></form>
+                            {% else %}
+                                <form action="{{ url_for('unblacklist_staff', staff_id=staff.id) }}" method="POST"><button class="btn btn-sm btn-warning" type="submit"><i class="bi bi-arrow-counterclockwise me-1"></i>Remove Blacklist</button></form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty-state"><div class="empty-icon"><i class="bi bi-person-x"></i></div><div class="empty-title">No staff registrations found</div><p class="empty-text">There are no staff records matching your search.</p></div>
+{% endif %}
+{% endblock %}

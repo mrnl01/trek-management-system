@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}All Bookings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="eyebrow">Administration</div>
+    <h1 class="page-title">All Trek Bookings</h1>
+    <p class="page-subtitle">Review booking, trek and payment information in one place.</p>
+</div>
+
+{% if bookings %}
+<div class="card table-card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th><th>Trekker</th>
+                    <th>Email</th><th>Trek</th>
+                    <th>Location</th><th>Booking Date</th>
+                    <th>Booking Status</th><th>Payment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td class="fw-semibold">#{{ booking.id }}</td>
+                    <td>{{ booking.user.name }}</td>
+                    <td>{{ booking.user.email }}</td>
+                    <td class="fw-semibold">{{ booking.trek.name }}</td>
+                    <td><i class="bi bi-geo-alt me-1 text-success"></i>{{ booking.trek.location }}</td>
+                    <td>{{ booking.booking_date.strftime("%d-%m-%Y") }}</td>
+                    <td>
+                        {% if booking.status == "Booked" or booking.status == "Approved" %}
+                        <span class="status-badge status-success"><i class="bi bi-check-circle"></i>{{ booking.status }}</span>
+                        {% elif booking.status == "Pending" %}
+                        <span class="status-badge status-warning"><i class="bi bi-clock"></i>{{ booking.status }}</span>
+                        {% elif booking.status == "Cancelled" %}
+                        <span class="status-badge status-danger"><i class="bi bi-x-circle"></i>{{ booking.status }}</span>
+                        {% else %}<span class="status-badge status-muted">{{ booking.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.payment_status == "Paid" %}
+                        <span class="status-badge status-success">{{ booking.payment_status }}</span>
+                        {% elif booking.payment_status == "Pending" %}
+                        <span class="status-badge status-warning">{{ booking.payment_status }}</span>
+                        {% else %}<span class="status-badge status-muted">{{ booking.payment_status }}</span>{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card empty-state">
+    <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+    <div class="empty-title">No bookings yet</div>
+    <p class="empty-text">No trek bookings have been made yet.</p>
+</div>
+{% endif %}
+{% endblock %}
