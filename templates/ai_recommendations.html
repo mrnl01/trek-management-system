@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trek Recommendations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            margin: 0;
+            padding: 30px;
+            color: #24332d;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000012;
+        }
+
+        h1 {
+            color: #216e50;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            border: 1px solid #ccd5d0;
+            border-radius: 6px;
+        }
+
+        button {
+            margin-top: 22px;
+            background: #216e50;
+            color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .trek {
+            border: 1px solid #d8e4dc;
+            padding: 16px;
+            margin-top: 14px;
+            border-radius: 8px;
+        }
+
+        .muted {
+            color: #617168;
+        }
+
+        a {
+            color: #216e50;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>AI Trek Recommendations</h1>
+    <p class="muted">
+        Find available treks that best match your preferences using A* search.
+    </p>
+
+    <form method="POST">
+        <label for="location">Preferred location</label>
+        <input
+            id="location"
+            name="location"
+            value="{{ preferences.location }}"
+            placeholder="e.g. Pune"
+            required
+        >
+
+        <label for="difficulty">Preferred difficulty</label>
+        <select id="difficulty" name="difficulty">
+            <option value="Easy"
+                {% if preferences.difficulty == "Easy" %}selected{% endif %}>
+                Easy
+            </option>
+            <option value="Moderate"
+                {% if preferences.difficulty == "Moderate" %}selected{% endif %}>
+                Moderate
+            </option>
+            <option value="Hard"
+                {% if preferences.difficulty == "Hard" %}selected{% endif %}>
+                Hard
+            </option>
+        </select>
+
+        <label for="max_duration">Maximum duration (days)</label>
+        <input
+            id="max_duration"
+            name="max_duration"
+            type="number"
+            min="1"
+            value="{{ preferences.max_duration }}"
+            required
+        >
+
+        <button type="submit">Find Recommendations</button>
+    </form>
+
+    {% if recommendations is not none %}
+        <h2>Results</h2>
+
+        {% if recommendations.treks %}
+            <p>
+                <strong>Search cost:</strong> {{ recommendations.cost }}
+            </p>
+            <p>
+                <strong>States explored:</strong>
+                {{ recommendations.states_explored }}
+            </p>
+
+            {% if recommendations.relaxed %}
+                <p>
+                    <strong>Preferences relaxed:</strong>
+                    {{ recommendations.relaxed | join(", ") }}
+                </p>
+                <p class="muted">
+                    These treks match after relaxing the preferences listed above.
+                </p>
+            {% else %}
+                <p>Your preferences matched available treks exactly!</p>
+            {% endif %}
+
+            {% for trek in recommendations.treks %}
+                <div class="trek">
+                    <h3>{{ trek.name }}</h3>
+                    <p><strong>Location:</strong> {{ trek.location }}</p>
+                    <p><strong>Difficulty:</strong> {{ trek.difficulty }}</p>
+                    <p><strong>Duration:</strong> {{ trek.duration }} days</p>
+                    <p><strong>Available slots:</strong>
+                        {{ trek.available_slots }}</p>
+
+                    <a href="{{ url_for('trek_details', trek_id=trek.id) }}">
+                        View trek
+                    </a>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No available treks were found, even after relaxing all preferences.</p>
+        {% endif %}
+    {% endif %}
+
+    <p><a href="{{ url_for('user_dashboard') }}">Back to dashboard</a></p>
+</div>
+</body>
+</html>

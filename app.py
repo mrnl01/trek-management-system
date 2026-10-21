@@ -7,6 +7,9 @@ from flask import (
     flash
 
 )
+
+from ai_recommender import astar_recommend
+
 from flask_login import (
     login_user,
     logout_user,
@@ -1476,6 +1479,70 @@ def update_participant_status(booking_id):
             trek_id=booking.trek_id
         )
     )
+
+
+@app.route("/user/ai-recommendations", methods=["GET", "POST"])
+@login_required
+def ai_recommendations():
+    if current_user.role != "trekker":
+        flash("Access denied.", "danger")
+        return redirect(url_for("login"))
+
+    recommendations = None
+    preferences = {
+        "location": "",
+        "difficulty": "Moderate",
+        "max_duration": 2,
+    }
+
+    if request.method == "POST":
+        location = request.form.get("location", "").strip()
+        difficulty = request.form.get("difficulty", "Moderate").strip()
+        max_duration_raw = request.form.get("max_duration", "2")
+
+        if not location:
+            flash("Please enter a preferred location.", "danger")
+        else:
+            try:
+                max_duration = int(max_duration_raw)
+
+                if max_duration < 1:
+                    raise ValueError
+
+                preferences = {
+                    "location": location,
+                    "difficulty": difficulty,
+                    "max_duration": max_duration,
+                }
+
+                treks = Trek.query.all()
+
+                trek_data = [
+                    {
+                        "id": trek.id,
+                        "name": trek.name,
+                        "location": trek.location,
+                        "difficulty": trek.difficulty,
+                        "duration": trek.duration,
+                        "status": trek.status,
+                        "available_slots": trek.available_slots,
+                    }
+                    for trek in treks
+                ]
+
+                result = astar_recommend(trek_data, preferences)
+                recommendations = result
+
+            except ValueError:
+                flash("Maximum duration must be a positive whole number.", "danger")
+
+    return render_template(
+        "ai_recommendations.html",
+        recommendations=recommendations,
+        preferences=preferences,
+    )
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
